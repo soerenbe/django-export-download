@@ -23,6 +23,9 @@ class ExportDownloadView(MultipleObjectMixin):
     resource_formats = ['csv', 'xls']
 
     def __init__(self, *args, **kwargs):
+        """
+        Here we are doing some sanity checks.
+        """
         super().__init__(*args, **kwargs)
 
         if not self._get_ressource_classes():
@@ -41,10 +44,17 @@ class ExportDownloadView(MultipleObjectMixin):
                                           'resource_formats'.format(f, self.__name__))
 
     def get_export_url(self, resource_class):
+        """
+        You can overwrite this method to return the download URL specified in your url.py
+        where calling .as_download()
+        """
         return reverse('{}-export'.format(resource_class.Meta.model._meta.model_name))
 
     @classmethod
     def _get_ressource_classes(cls):
+        """
+        Format the resource classes
+        """
         if cls.resource_class is None:
             return []
         elif isinstance(cls.resource_class, list):
@@ -53,6 +63,15 @@ class ExportDownloadView(MultipleObjectMixin):
             return [cls.resource_class]
 
     def _get_resource_links(self, request):
+        """
+        This method return a dict in the form:
+        {
+            '<resource_format>': ['<download_link>', '<description>',
+            ...
+        }
+
+        It is only used when using the export_download_menu templatetag
+        """
         resource_links = {}
 
         for f in self.resource_formats:
@@ -66,25 +85,33 @@ class ExportDownloadView(MultipleObjectMixin):
                 }
                 params.update(params_class)
                 link = export_url + "?" + self._to_url_params(params)
+                # if there is a description field in the resource class
+                # we use it to display it as a description
                 description = getattr(resource_class, 'description', resource_class.__name__)
                 resource_links[f.lower()].append([link, description])
         return resource_links
 
     @staticmethod
     def _to_url_params(d):
+        """
+        reeturn a kwarg in GET parameter format
+        """
         return "&".join('{}={}'.format(k, v) for k, v in d.items())
 
     @classmethod
     def as_download(cls, *args, **kwargs):
-
+        """
+        This method returns the view where the data is exported.
+        It is inspired by the .as_view() from django.
+        """
         def view(request, *args, **kwargs):
             if request.method != 'GET':
                 return HttpResponseNotAllowed(['GET'])
-            resource_class = request.GET.get(cls.resource_class_parameter, cls.resource_formats[0])
+            # We use the first resource class and first resource format
+            # as a default, when there are no parameters
+            resource_class = request.GET.get(cls.resource_class_parameter, 0)
             resource_format = request.GET.get(cls.resource_format_parameter, cls._get_ressource_classes()[0])
 
-            if not resource_class:
-                raise Http404('You have to pass {} as GET parameter'.format(cls.resource_class_parameter))
             if not resource_format:
                 raise Http404('You have to pass {} as GET parameter'.format(cls.resource_format_parameter))
 
@@ -96,6 +123,8 @@ class ExportDownloadView(MultipleObjectMixin):
                 resource_class_number = int(resource_class)
             except:
                 raise Http404('Parameter {} must be an integer'.format(cls.resource_class_parameter))
+            if resource_class_number >= len(cls._get_ressource_classes()):
+                raise Http404('Parameter {}.{} does not exist'.format(cls.__name__, cls.resource_class_parameter))
 
             qs = cls.model.objects.all()
             # If filer_class is defined try to filter against it.
