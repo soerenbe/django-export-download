@@ -1,9 +1,11 @@
 # django-export-download
 
-`django-export-download` provides a MultipleObject/ListView Mixin for Django. It add a additional
-classmethod and provide a `as_download()` method. You can use this view to download the object list
-in different file fomats like CSV, XLS and more. You just have to provide a `Resource` class from 
-`django-import-export`.
+`django-export-download` allows you to use your ListView to download it in different file formats
+like CSV or XLS by just adding the Mixin and add a new URL to your `urls.py`
+
+It provides a MultipleObject/ListView Mixin for Django and add a classmethod `as_download()` method. 
+You can use this view to download the object list in different file fomats like CSV, XLS and more. 
+You just have to provide a `Resource` class from `django-import-export`.
 
 I addition it work very good in you `django-tables2`/`django-filter` environment.
 
@@ -53,7 +55,8 @@ http://localhost:8000/movie/export?resource_format=xls will download a Excel fil
 # Dokumentation
 
 ## Class Options
-Here is a more complex example that includes 
+Here is a more complex example that includes several `Resources` and different file formats.
+It also is a example how to use `django-export-download` with `django-filter` and `django-tables2`.
 ```python
 
 import django_tables2 as table
@@ -93,15 +96,17 @@ class MovieListView(ExportDownloadView, ListView, table.SingleTableMixin):
 This implementation support 3 download formats with 3 different `Resources`. Following URLs are giving 
 you the files:
 
-* http://localhost:8000/movie/export/?resource_class=0&resource_format=xls
-* http://localhost:8000/movie/export/?resource_class=0&resource_format=csv
-* http://localhost:8000/movie/export/?resource_class=0&resource_format=tsv
-* http://localhost:8000/movie/export/?resource_class=1&resource_format=xls
-* http://localhost:8000/movie/export/?resource_class=1&resource_format=csv
-* http://localhost:8000/movie/export/?resource_class=1&resource_format=tsv
-* http://localhost:8000/movie/export/?resource_class=2&resource_format=xls
-* http://localhost:8000/movie/export/?resource_class=2&resource_format=csv
-* http://localhost:8000/movie/export/?resource_class=2&resource_format=tsv
+```
+http://localhost:8000/movie/export/?resource_class=0&resource_format=xls
+http://localhost:8000/movie/export/?resource_class=0&resource_format=csv
+http://localhost:8000/movie/export/?resource_class=0&resource_format=tsv
+http://localhost:8000/movie/export/?resource_class=1&resource_format=xls
+http://localhost:8000/movie/export/?resource_class=1&resource_format=csv
+http://localhost:8000/movie/export/?resource_class=1&resource_format=tsv
+http://localhost:8000/movie/export/?resource_class=2&resource_format=xls
+http://localhost:8000/movie/export/?resource_class=2&resource_format=csv
+http://localhost:8000/movie/export/?resource_class=2&resource_format=tsv
+```
 
 Note that `resource_class` defines the position of the `Resource` implementation in the list of `resource_class`
 
