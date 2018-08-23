@@ -86,12 +86,11 @@ class ResourceDownloadMixin:
                 resource_links[f.lower()].append([link, description])
         return resource_links
 
-    @staticmethod
-    def _to_url_params(d):
+    def _to_url_params(self, d):
         """
-        reeturn a kwarg in GET parameter format
+        return a kwarg in GET parameter format
         """
-        return 'download&' + "&".join('{}={}'.format(k, v) for k, v in d.items())
+        return self._download_parameter + "&" + "&".join('{}={}'.format(k, v) for k, v in d.items())
 
     def render_to_response(self, *args, **kwargs):
         if self._download_parameter in self.request.GET:
