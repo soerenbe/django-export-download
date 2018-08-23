@@ -1,3 +1,8 @@
-# 0.1
+# 0.2.0
 
-unreleased
+* removed `as_download()` end render the response in the `render_to_response`
+* renamed `ExportDownloadView` to `ResourceDownloadMixin`
+
+# 0.1.4
+
+first release

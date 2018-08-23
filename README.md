@@ -1,9 +1,10 @@
 # django-export-download
 
 `django-export-download` allows you to use your ListView to download it in different file formats
-like CSV or XLS by just adding the Mixin and add a new URL to your `urls.py`
+like CSV or XLS by just adding the Mixin.
 
-It provides a MultipleObject/ListView Mixin for Django and add a classmethod `as_download()` method. 
+It provides a MultipleObject/ListView Mixin for Django. By passing the `download` GET parameter you can
+download the file. 
 You can use this view to download the object list in different file fomats like CSV, XLS and more. 
 You just have to provide a `Resource` class from `django-import-export`.
 
@@ -13,7 +14,7 @@ Finally the package ships with a templatetag to include some download buttons in
 
 
 # Requirements
-I tested the package with following versions, but it also should 
+The package is tested with following versions, but it also should 
 work with newer or older versions
 
 * Django >= 1.11
@@ -26,7 +27,7 @@ work with newer or older versions
 views.py:
 
 from import_export import resources
-from export_download.views import ExportDownloadView
+from export_download.views import ResourceDownloadMixin
 from django.views.generic import ListView
 
 
@@ -36,7 +37,7 @@ class MovieBudgetResource(resources.ModelResource):
         fields = ['title', 'budget']
 
 
-class MovieListView(ExportDownloadView, ListView):
+class MovieListView(ResourceDownloadMixin, ListView):
     model = Movie
     resource_class = MovieBudget
     
@@ -44,14 +45,13 @@ urls.py:
 
 urlpatterns = [
     path('movie/', MovieListView.as_view(), name='movie-list'),
-    path('movie/export/', MovieListView.as_download(), name='movie-export'),
 ]
 ```
 
-By visiting http://localhost:8000/movie/export you can download a CSV (which is the default) file with the movies 
+By visiting http://localhost:8000/movie/?download you can download a CSV (which is the default) file with the movies 
 and their budget.
 
-http://localhost:8000/movie/export?resource_format=xls will download a Excel file.
+```http://localhost:8000/movie/?download&resource_format=xls will download a Excel file.```
 # Dokumentation
 
 ## Class Options
@@ -61,7 +61,7 @@ It also is a example how to use `django-export-download` with `django-filter` an
 
 import django_tables2 as table
 from import_export import resources
-from export_download.views import ExportDownloadView
+from export_download.views import ResourceDownloadMixin
 from django.views.generic import ListView
     
 
@@ -81,7 +81,7 @@ class MovieBudgetResource(resources.ModelResource):
         fields = ['title', 'budget']
 
 
-class MovieListView(ExportDownloadView, ListView, table.SingleTableMixin):
+class MovieListView(ResourceDownloadMixin, ListView, table.SingleTableMixin):
     model = Movie
     table_class = MovieTable
     filter_class = MovieFilter
@@ -97,15 +97,15 @@ This implementation support 3 download formats with 3 different `Resources`. Fol
 you the files:
 
 ```
-http://localhost:8000/movie/export/?resource_class=0&resource_format=xls
-http://localhost:8000/movie/export/?resource_class=0&resource_format=csv
-http://localhost:8000/movie/export/?resource_class=0&resource_format=tsv
-http://localhost:8000/movie/export/?resource_class=1&resource_format=xls
-http://localhost:8000/movie/export/?resource_class=1&resource_format=csv
-http://localhost:8000/movie/export/?resource_class=1&resource_format=tsv
-http://localhost:8000/movie/export/?resource_class=2&resource_format=xls
-http://localhost:8000/movie/export/?resource_class=2&resource_format=csv
-http://localhost:8000/movie/export/?resource_class=2&resource_format=tsv
+http://localhost:8000/movie/?download&resource_class=0&resource_format=xls
+http://localhost:8000/movie/?download&resource_class=0&resource_format=csv
+http://localhost:8000/movie/?download&resource_class=0&resource_format=tsv
+http://localhost:8000/movie/?download&resource_class=1&resource_format=xls
+http://localhost:8000/movie/?download&resource_class=1&resource_format=csv
+http://localhost:8000/movie/?download&resource_class=1&resource_format=tsv
+http://localhost:8000/movie/?download&resource_class=2&resource_format=xls
+http://localhost:8000/movie/?download&resource_class=2&resource_format=csv
+http://localhost:8000/movie/?download&resource_class=2&resource_format=tsv
 ```
 
 Note that `resource_class` defines the position of the `Resource` implementation in the list of `resource_class`
@@ -115,18 +115,13 @@ to the queryset. It is not required, but works really well. Have a look at https
 for more information.
 
 ## Templatetags
-`django-export-download` ships with a templatetag to render all links above. To use it your
-download URL should point to the view name `<model_name>-export` or you have to overwrite the (simple) method
-```python
-def get_export_url(self, resource_class):
-    return reverse('{}-export'.format(resource_class.Meta.model._meta.model_name))
-```
+`django-export-download` ships with a templatetag to render all links above.
 
 You now can use the templatetag in you ListView
 ```html
 {% load export_download %}
 
-{% export_download_menu %}
+{% resource_download_menu %}
 ```
 # Contribute
 Fork and send a PR
