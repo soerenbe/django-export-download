@@ -29,22 +29,23 @@ class ResourceDownloadMixin:
         """
         super().__init__(*args, **kwargs)
 
-        if not issubclass(self.__class__, ListView):
-            raise NotImplementedError('You can use the ExportDownloadMixin only in a ListView')
-        if not self._get_ressource_classes():
-            raise NotImplementedError('Object {}.resource_class must be defined.'.format(self.__class__.__name__))
-        for k in self._get_ressource_classes():
-            if not issubclass(k, Resource):
-                raise NotImplementedError('Object {} in {}.resource_class is not a instance of '
-                                          'import_export.resources.Resource'.format(k, self.__class__.__name__))
+        cn = self.__class__.__name__
 
-        if not self.resource_formats or len(self.resource_formats) == 0:
-            raise NotImplementedError('Format {} in {}.resource_formats is not a valid '
-                                      'resource_format'.format(self.resource_formats, self.__name__))
+        assert issubclass(self.__class__, ListView), \
+            'You can use the ExportDownloadMixin only in a ListView'
+        assert self._get_ressource_classes(), \
+            'Object {}.resource_class must be defined.'.format(cn)
+        for k in self._get_ressource_classes():
+            assert issubclass(k, Resource), \
+                'Object {} in {}.resource_class is not a instance of import_export.resources.Resource'.format(k, cn)
+
+        assert type(self.resource_formats) is list, \
+            'Format {} in {}.resource_formats is not a valid resource_format'.format(self.resource_formats, cn)
+        assert len(self.resource_formats) > 0, \
+            'Format {} in {}.resource_formats must not be empty'.format(self.resource_formats, cn)
         for f in self.resource_formats:
-            if f not in self._resource_format_map:
-                raise NotImplementedError('Format {} in {}.resource_class is not a valid '
-                                          'resource_formats'.format(f, self.__name__))
+            assert f in self._resource_format_map, \
+                'Format {} in {}.resource_class is not a valid resource_formats'.format(f, cn)
 
     @classmethod
     def _get_ressource_classes(cls):
