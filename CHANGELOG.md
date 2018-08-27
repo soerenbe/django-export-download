@@ -1,3 +1,9 @@
+# 0.2.2
+
+* Fixed bug in default resource format lookup
+* Moved button template to own directory
+* Refactored sanity checks
+
 # 0.2.1
 
 * fixed download parameter lookup
