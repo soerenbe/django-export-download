@@ -104,8 +104,7 @@ class ResourceDownloadMixin:
         # We use the first resource class and first resource format
         # as a default, when there are no parameters
         resource_class = self.request.GET.get(self.resource_class_parameter, 0)
-        resource_format = self.request.GET.get(self.resource_format_parameter, self._get_ressource_classes()[0])
-
+        resource_format = self.request.GET.get(self.resource_format_parameter, self.resource_formats[0])
         if not resource_format:
             raise Http404('You have to pass {} as GET parameter'.format(self.resource_format_parameter))
 
