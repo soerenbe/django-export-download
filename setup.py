@@ -9,7 +9,7 @@ with open('README.md') as file:
 setup(
     name='django-export-download',
     packages=find_packages(exclude=['build', 'demo']),
-    version='0.2.2',
+    version='0.2.3',
     description='A Django library that adds a ListView Mixin for downloading a list in different file formats',
     long_description=long_description,
     author='Sören Berger',
@@ -20,7 +20,7 @@ setup(
     install_requires=["Django>=1.11", "django-import-export>=1.0"],
     license='GPL-3',
     package_data={
-        '': ['templates/*.html'],
+        '': ['templates/export_download/*.html'],
     },
     classifiers=[
         'Framework :: Django',

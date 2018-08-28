@@ -1,3 +1,8 @@
+# 0.2.3
+
+* Fixed missing template from refactoring
+* refactored sanity checks
+
 # 0.2.2
 
 * Fixed bug in default resource format lookup
