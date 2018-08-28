@@ -23,14 +23,8 @@ class ResourceDownloadMixin:
 
     _download_parameter = 'download'
 
-    def __init__(self, *args, **kwargs):
-        """
-        Here we are doing some sanity checks.
-        """
-        super().__init__(*args, **kwargs)
-
+    def _sanity_check(self):
         cn = self.__class__.__name__
-
         assert issubclass(self.__class__, ListView), \
             'You can use the ExportDownloadMixin only in a ListView'
         assert self._get_ressource_classes(), \
@@ -47,17 +41,16 @@ class ResourceDownloadMixin:
             assert f in self._resource_format_map, \
                 'Format {} in {}.resource_class is not a valid resource_formats'.format(f, cn)
 
-    @classmethod
-    def _get_ressource_classes(cls):
+    def _get_ressource_classes(self):
         """
         Format the resource classes
         """
-        if cls.resource_class is None:
+        if self.resource_class is None:
             return []
-        elif isinstance(cls.resource_class, list):
-            return cls.resource_class
+        elif isinstance(self.resource_class, list):
+            return self.resource_class
         else:
-            return [cls.resource_class]
+            return [self.resource_class]
 
     def get_resource_links(self, request):
         """
@@ -99,6 +92,7 @@ class ResourceDownloadMixin:
         return super().render_to_response(*args, **kwargs)
 
     def render_to_download_response(self, *args, **kwargs):
+        self._sanity_check()
         if self.request.method != 'GET':
             return HttpResponseNotAllowed(['GET'])
         # We use the first resource class and first resource format
